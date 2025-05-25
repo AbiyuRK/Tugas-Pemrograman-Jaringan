@@ -1,0 +1,69 @@
+FILE SERVER
+TUJUAN: melayani client dalam request file server
+
+ATURAN PROTOKOL:
+- client harus mengirimkan request dalam bentuk string
+- string harus dalam format
+  REQUEST spasi PARAMETER
+- PARAMETER dapat berkembang menjadi PARAMETER1 spasi PARAMETER2 dan seterusnya
+
+REQUEST YANG DILAYANI:
+- informasi umum:
+  * Jika request tidak dikenali akan menghasilkan pesan
+    - status: ERROR
+    - data: request tidak dikenali
+  * Semua result akan diberikan dalam bentuk JSON dan diakhiri
+    dengan character ascii code #13#10#13#10 atau "\r\n\r\n"
+
+LIST
+* TUJUAN: untuk mendapatkan daftar seluruh file yang dilayani oleh file server
+* PARAMETER: tidak ada
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: list file
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
+
+GET
+* TUJUAN: untuk mendapatkan isi file dengan menyebutkan nama file dalam parameter
+* PARAMETER:
+  - PARAMETER1 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data_namafile : nama file yang diminta
+  - data_file : isi file yang diminta (dalam bentuk base64)
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
+
+UPLOAD
+* TUJUAN: mengirimkan file dari client ke server dengan menyebutkan filepath dan nama file yang akan disimpan ke dalam parameter
+* PARAMETER:
+  - PARAMETER1 : filepath lokal yang akan dikirim
+  - PARAMETER2 : nama file yang akan disimpan di server
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: Pesan berhasil
+- GAGAL:
+  - status: ERROR
+  - data: Pesan kesalahan
+* Penjelasan:
+  Request UPLOAD bertujuan mengirimkan file dari client ke server dengan tambahan opsi untuk mengubah nama file yang akan dikirim nantinya. Format request UPLOAD adalah "UPLOAD PARAMETER1 PARAMETER2" dengan PARAMETER1 merupakan alamat file lokal di mesin client dan PARAMETER2 merupakan nama file yang akan disimpan nantinya di server. Jika file berhasil dikirimkan, client akan menerima data berupa pesan berhasil dengan menyertakan nama file yang dikirimkan ke server. Jika request client gagal, maka client akan menerima status ERROR dengan data berupa pesan kesalahan yang sesuai dengan jenis error yang terjadi.
+
+DELETE
+* TUJUAN: menghapus file yang terdapat di server dengan menyebutkan nama file ke parameter
+* PARAMETER:
+  - PARAMETER1 : nama file yang akan dihapus dari server
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: Pesan berhasil
+- GAGAL:
+  - status: ERROR
+  - data: Pesan kesalahan
+* Penjelasan:
+  Request DELETE bertujuan menghapus file yang terdapat di dalam server. Format request DELETE adalah "UPLOAD PARAMETER1" dengan PARAMETER1 merupakan nama file di server yang akan dihapus. Jika request client berhasil dieksekusi oleh server, file akan dihapus oleh server dan server akan mengirimkan respons kembali ke client dengan data berupa pesan berhasilnya terhapus file tersebut. Jika request client gagal, maka client akan menerima data berupa pesan kesalahan yang sesuai dengan jenis error yang terjadi.
