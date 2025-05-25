@@ -1,5 +1,5 @@
 import os
-import json
+# import json
 import base64
 from glob import glob
 
@@ -26,17 +26,19 @@ class FileInterface:
         except Exception as e:
             return dict(status='ERROR',data=str(e))
         
-    def put(self,params=[]):
+    def upload(self,params=[]):
         try:
             filename = params[0]
             data_file = params[1]
-            if (filename == '' or data_file == ''):
+            if filename == '' or data_file == '':
                 return dict(status='ERROR', data='Parameter filename atau data_file tidak lengkap')
             
             with open(f"{filename}", 'wb+') as fp:
                 fp.write(base64.b64decode(data_file))
                 
-            return dict(status='OK', data=filename)
+            return dict(status='OK', data=f"{filename} berhasil diupload")
+        except IndexError:
+            return dict(status='ERROR', data='Format Upload: upload <filename> <data_file>')
         except Exception as e:
             return dict(status='ERROR',data=str(e))
         
@@ -47,11 +49,11 @@ class FileInterface:
                 return dict(status='ERROR', data='Filename tidak boleh kosong')
             if os.path.exists(filename):
                 os.remove(filename)
-                return dict(status='OK',data=filename)
+                return dict(status='OK',data=f"{filename} berhasil dihapus")
             else:
                 return dict(status='ERROR', data='File tidak ditemukan')
         except IndexError:
-            return dict(status='ERROR', data='Format DELETE: DELETE <filename>')
+            return dict(status='ERROR', data='Format Delete: delete <filename>')
         except Exception as e:
             return dict(status='ERROR',data=str(e))
         

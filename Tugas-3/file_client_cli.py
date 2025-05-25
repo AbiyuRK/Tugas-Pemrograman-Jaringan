@@ -74,11 +74,13 @@ def remote_get(filename=""):
         print("Gagal")
         return False
 
-def remote_put(filepath="", filename=""):
-    if not filepath or filename:
+def remote_upload(filepath="", filename=""):
+    if not filepath or not filename:
+        print("Format Upload : upload <local_filepath> <remote_filename>")
         return False
     
     if not os.path.exists(filepath):
+        print(f"Error: File {filepath} tidak dapat ditemukan.")
         return False
     
     try:
@@ -86,51 +88,63 @@ def remote_put(filepath="", filename=""):
         content = base64.b64encode(fp.read()).decode()
         fp.close()
         
-        hasil = send_command(f"PUT {filename} {content}")
+        hasil = send_command(f"UPLOAD {filename} {content}")
         if hasil['status'] == 'OK':
-            print(f"File {filename} berhasil diupload.")
+            print(f"{hasil['data']}")
             return True
         else:
-            print("Gagal")
+            print(f"File {filename} gagal diupload: {hasil['data']}")
             return False
     except Exception as e:
         print(f"Error saat upload file: {str(e)}")
         return False
-    
-# def remote_put(filename=""):
-#     if (filename == ''):
-#         return None
-#     try:
-#         fp = open(f"{filename}",'rb')
-#         isifile = base64.b64encode(fp.read()).decode()
-#         file = json.dumps(dict(data_namafile = filename, data_file = isifile))
-        
-#         command_str = f"PUT {file}"
-#         hasil = send_command(command_str)
-#         if(hasil['status']=='OK'):
-#             return True
-#         else:
-#             print("Gagal")
-#             return False
-#     except FileNotFoundError:
-#         print(f"File {filename} tidak ditemukan.")
-#         return False
-#     except Exception as e:
-#         print(f"Error saat upload file: {str(e)}")
-#         return False
 
 def remote_delete(filename=""):
     command_str=f"DELETE {filename}"
     hasil = send_command(command_str)
     if (hasil['status']=='OK'):
-        print(f"File {filename} berhasil dihapus.")
+        print(f"{hasil['data']}")
         return True
     else:
-        print("Gagal")
+        print(f"Gagal menghapus file: {hasil['data']}")
         return False
 
 if __name__=='__main__':
     server_address=('172.16.16.101',7777)
-    remote_list()
-    remote_get('donalbebek.jpg')
+    
+    print("Selamat datang di Client CLI")
+    print("Ketik 'help' untuk melihat daftar perintah yang tersedia.")
+    while True:
+        user_input = input(">>> ").strip()
+        if not user_input:
+            continue
+        
+        input_parts = user_input.split(" ", 1)
+        req = input_parts[0].lower()
+        args = input_parts[1] if len(input_parts) > 1 else ""
+        
+        if req == "list":
+            remote_list()
+        elif req == "get":
+            remote_get(args)
+        elif req == "upload":
+            param = args.split(" ", 1)
+            if len(param) != 2:
+                print("Kesalahan input. Format Upload : upload <local_filepath> <remote_filename>")
+                continue
+            remote_upload(param[0], param[1])
+        elif req == "delete":
+            remote_delete(args)
+        elif req == "exit":
+            print("Keluar dari program.")
+            break
+        elif req == "help":
+            print("Daftar perintah:")
+            print("- list: Menampilkan daftar file di server.")
+            print("- get <filename>: Mengunduh file dari server.")
+            print("- upload <local_filepath> <remote_filename>: Mengunggah file ke server.")
+            print("- delete <filename>: Menghapus file di server.")
+            print("- exit: Keluar dari program.")
+        else:
+            print("Perintah tidak dikenali. Ketik 'help' untuk melihat daftar perintah yang tersedia.")
 

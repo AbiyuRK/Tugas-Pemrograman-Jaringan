@@ -35,7 +35,7 @@ class FileProtocol:
         except AttributeError:
             return json.dumps(dict(status='ERROR', data='request tidak dikenali'))
         except IndexError:
-            return json.dumps(dict(status='ERROR', data='Parameter tidak lengkap'))
+            return json.dumps(dict(status='ERROR', data='Parameter pada request belum terpenuhi'))
         except Exception as e:
             logging.error(f"Error processing request: {e}")
             return json.dumps(dict(status='ERROR', data=f'Terjadi kesalahan: {str(e)}'))
